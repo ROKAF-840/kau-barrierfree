@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>한국항공대 베리어프리 지도</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    #tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+      font-size: 14px;
+      max-width: 300px;
+    }
+    .map-container {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+<h2>한국항공대 베리어프리 지도</h2>
+<div class="map-container">
+  <img id="map" src="kau_map_converted.jpg" width="1000" alt="지도">
+  <div id="tooltip"></div>
+</div>
+
+<script>
+const tooltip = document.getElementById("tooltip");
+const map = document.getElementById("map");
+
+const regions = [
+  {
+    name: "항공대역 2번출구",
+    coords: [[801,154],[923,276],[835,363],[714,242]],
+    desc: "휠체어 리프트 미운영, 음향신호기 없음, 경사로는 설치되어 있음"
+  },
+  {
+    name: "과학관",
+    coords: [[302,281],[480,344],[287,318],[467,382]],
+    desc: "엘리베이터 미설치로 이동 약자 접근 제한"
+  },
+  {
+    name: "강의동",
+    coords: [[603,628],[740,682],[593,660],[731,713]],
+    desc: "정문 진입 필요. 경사로 및 점자 안내판 있음(음성 버튼 미작동), 엘리베이터와 장애인 화장실 구비"
+  },
+  {
+    name: "학관",
+    coords: [[299,616],[362,639],[264,713],[325,738]],
+    desc: "경사로 자체는 넓지만 급커브 및 수풀 침범으로 실질 폭 좁음. 엘리베이터 없음"
+  },
+  {
+    name: "본관",
+    coords: [[240,825],[316,856],[189,956],[268,986]],
+    desc: "장애인 전용 주차장 및 엘리베이터, 경사로 설치되어 있음"
+  },
+  {
+    name: "도서관",
+    coords: [[242,1062],[325,1093],[215,1145],[285,1171]],
+    desc: "옆에 장애인 주차장 및 엘리베이터 존재. 우측 경사로는 주차 차량으로 접근 곤란"
+  },
+  {
+    name: "중소기업벤처육성센터",
+    coords: [[358,1104],[476,1152],[382,1183],[411,1197]],
+    desc: "경사로에 풀이 침범하여 접근성에 방해 요인 존재"
+  },
+  {
+    name: "항공우주박물관",
+    coords: [[456,676],[509,693],[425,766],[477,781]],
+    desc: "엘리베이터 및 장애인 화장실이 잘 갖춰져 있음"
+  }
+];
+
+map.addEventListener("mousemove", function(e) {
+  const x = e.offsetX;
+  const y = e.offsetY;
+  let found = false;
+
+  for (const region of regions) {
+    if (pointInPolygon([x, y], region.coords)) {
+      tooltip.style.display = "block";
+      tooltip.style.left = (e.pageX + 10) + "px";
+      tooltip.style.top = (e.pageY + 10) + "px";
+      tooltip.innerText = `${region.name}: ${region.desc}`;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    tooltip.style.display = "none";
+  }
+});
+
+function pointInPolygon(point, vs) {
+  const [x, y] = point;
+  let inside = false;
+  for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+    const xi = vs[i][0], yi = vs[i][1];
+    const xj = vs[j][0], yj = vs[j][1];
+
+    const intersect = ((yi > y) != (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / ((yj - yi) + 0.00001) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+</script>
+
+</body>
+</html>
